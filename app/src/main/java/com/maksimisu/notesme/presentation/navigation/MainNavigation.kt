@@ -51,7 +51,7 @@ fun SetUpNavHost(navHostController: NavHostController) {
             route = MainNavigation.EditScreen.route + "?id={id}",
             arguments = listOf(
                 navArgument(name = "id") {
-                    nullable = true
+                    nullable = false
                     type = NavType.LongType
                 }
             )
