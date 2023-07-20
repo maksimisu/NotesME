@@ -32,33 +32,33 @@ fun SetUpNavHost(navHostController: NavHostController) {
 
         // READ
         composable(
-            route = MainNavigation.ReadScreen.route + "/{id}",
+            route = MainNavigation.ReadScreen.route + "/{name}",
             arguments = listOf(
-                navArgument(name = "id") {
+                navArgument(name = "name") {
                     nullable = false
-                    type = NavType.LongType
+                    type = NavType.StringType
                 }
             )
         ) {
             ReadScreen(
                 navHostController = navHostController,
-                id = it.arguments!!.getLong("id")
+                name = it.arguments!!.getString("name", "README")
             )
         }
 
         // EDIT
         composable(
-            route = MainNavigation.EditScreen.route + "?id={id}",
+            route = MainNavigation.EditScreen.route + "?name={name}",
             arguments = listOf(
-                navArgument(name = "id") {
-                    nullable = false
-                    type = NavType.LongType
+                navArgument(name = "name") {
+                    nullable = true
+                    type = NavType.StringType
                 }
             )
         ) {
             EditScreen(
                 navHostController = navHostController,
-                id = it.arguments?.getLong("id")
+                name = it.arguments?.getString("name")
             )
         }
 

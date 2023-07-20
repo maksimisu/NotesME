@@ -4,6 +4,13 @@
     <string name="options_menu">Options menu</string>
     <string name="expand">Expand</string>
     <string name="narrow">Narrow</string>
-    <string name="creation_date">Creation date: </string>
-    <string name="symbols_used">Symbols used: </string>
+    <string name="creation_date">Creation date:</string>
+    <string name="symbols_used">Symbols used:</string>
+    <string name="back">Back</string>
+    <string name="add">Add</string>
+    <string name="read">Read mode</string>
+    <string name="edit">Edit mode</string>
+    <string name="last_update">Last update:</string>
+    <string name="done">done</string>
+    <string name="note_already_exists">Note with such title already exists!</string>
 </resources>

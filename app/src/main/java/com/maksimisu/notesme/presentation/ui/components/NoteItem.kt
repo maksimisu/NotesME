@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -32,10 +31,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.maksimisu.notesme.R
 import com.maksimisu.notesme.data.models.Note
 import com.maksimisu.notesme.presentation.ui.theme.LightBlue
@@ -44,6 +41,7 @@ import com.maksimisu.notesme.presentation.ui.theme.LightYellow
 @Composable
 fun NoteItem(
     note: Note,
+    number: Int,
     onClick: () -> Unit
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
@@ -76,7 +74,7 @@ fun NoteItem(
                         style = MaterialTheme.typography.headlineMedium
                     )
                     Text(
-                        text = note.lastUpdateDate,
+                        text =  "${stringResource(id = R.string.last_update)} ${note.getTimeFormatted()}",
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -89,7 +87,7 @@ fun NoteItem(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "${note.id}",
+                        text = number.toString(),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White
                     )
@@ -161,7 +159,7 @@ fun NoteItem(
                         )
                         Spacer(modifier = Modifier.height(5.dp))
                         Text(
-                            text = stringResource(id = R.string.creation_date) + note.creationDate,
+                            text = "${stringResource(id = R.string.creation_date)} ${note.creationDate}",
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier
                                 .width(262.dp),

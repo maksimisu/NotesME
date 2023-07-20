@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.maksimisu.notesme.data.models.ActionType
+import com.maksimisu.notesme.presentation.models.ActionType
 
 @Composable
 fun DialogActionButton(

@@ -1,4 +1,4 @@
-package com.maksimisu.notesme.data.models
+package com.maksimisu.notesme.presentation.models
 
 import androidx.compose.ui.graphics.Color
 import com.maksimisu.notesme.presentation.ui.theme.DarkGreen

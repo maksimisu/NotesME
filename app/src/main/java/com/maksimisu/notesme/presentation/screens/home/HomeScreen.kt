@@ -2,6 +2,7 @@ package com.maksimisu.notesme.presentation.screens.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,8 +12,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -20,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,10 +35,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.maksimisu.notesme.R
 import com.maksimisu.notesme.data.models.Note
+import com.maksimisu.notesme.presentation.navigation.MainNavigation
 import com.maksimisu.notesme.presentation.ui.components.NoteItem
 import com.maksimisu.notesme.presentation.ui.components.TwoActionsDialog
 import com.maksimisu.notesme.presentation.ui.theme.LightBlue
@@ -43,8 +50,8 @@ import com.maksimisu.notesme.presentation.ui.theme.LightBlue
 @Composable
 fun HomeScreen(navHostController: NavHostController) {
 
-    var showDeleteNoteDialog by remember { mutableStateOf(false) }
-    var selectedDeleteNoteId by remember { mutableStateOf<Int?>(null) }
+    val viewModel = hiltViewModel<HomeViewModel>()
+    val notes = viewModel.notes.collectAsState(initial = null).value
 
     Scaffold(
         topBar = {
@@ -66,6 +73,7 @@ fun HomeScreen(navHostController: NavHostController) {
                     actionIconContentColor = Color.Black,
                 ),
                 actions = {
+                    // OPTIONS MENU
                     Icon(
                         imageVector = Icons.Filled.MoreVert,
                         contentDescription = stringResource(id = R.string.options_menu),
@@ -77,64 +85,50 @@ fun HomeScreen(navHostController: NavHostController) {
                     )
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    navHostController
+                        .navigate(route = MainNavigation.EditScreen.route + "?name=${null}")
+                },
+                shape = RoundedCornerShape(100f),
+                containerColor = LightBlue,
+                contentColor = Color.Black
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(id = R.string.add)
+                )
+            }
         }
     ) { paddingValues ->
         paddingValues.calculateTopPadding()
-
-        if (showDeleteNoteDialog) {
-            TwoActionsDialog(
-                title = "DELETE?",
-                message = "This action cannot be cancelled!",
-                negativeButtonLabel = "Cancel",
-                positiveButtonLabel = "Delete",
-                negativeButtonAction = {
-                    selectedDeleteNoteId = null
-                },
-                positiveButtonAction = {
-                    if (selectedDeleteNoteId != null && selectedDeleteNoteId!! > 0)
-                        TODO("Delete note. Not implemented yet.")
-                    else
-                        TODO("Not implemented yet.")
-                },
-                onDismissRequest = {
-                    showDeleteNoteDialog = false
-                    selectedDeleteNoteId = null
-                }
-            )
-        }
 
         // CONTENT
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 74.dp),
+                .padding(top = 64.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top)
         ) {
-            val notes = listOf(
-                Note(
-                    id = 1,
-                    title = "First note",
-                    body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tincidunt sollicitudin elementum. Donec finibus lectus metus, vel porta orci pulvinar et. Curabitur non ligula venenatis, tincidunt dui nec, vestibulum est. Sed ex leo, porta a felis a, vehicula finibus dolor. Fusce feugiat luctus ante non placerat. Sed sed ipsum dui. Aliquam erat volutpat. Ut vel diam finibus, tristique odio in, vestibulum nisi. Integer et nulla convallis nisl faucibus varius ut a ligula. Ut fringilla nulla a elit tristique, aliquam congue risus pharetra. Suspendisse odio quam, placerat eget porta et, tempus varius magna. Morbi commodo lectus sed nisi facilisis finibus. Nam.",
-                    creationDate = "25.06.2023::15:22",
-                    lastUpdateDate = "25.06.2023::15:22"
-                ),
-                Note(
-                    id = 2,
-                    title = "Second note",
-                    body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tincidunt sollicitudin elementum. Donec finibus lectus metus, vel porta orci pulvinar et. Curabitur non ligula venenatis, tincidunt dui nec, vestibulum est. Sed ex leo, porta a felis a, vehicula finibus dolor. Fusce feugiat luctus ante non placerat. Sed sed ipsum dui. Aliquam erat volutpat. Ut vel diam finibus, tristique odio in, vestibulum nisi. Integer et nulla convallis nisl faucibus varius ut a ligula. Ut fringilla nulla a elit tristique, aliquam congue risus pharetra. Suspendisse odio quam, placerat eget porta et, tempus varius magna. Morbi commodo lectus sed nisi facilisis finibus. Nam.",
-                    creationDate = "25.06.2023::15:22",
-                    lastUpdateDate = "25.06.2023::15:22"
-                )
-            )
 
-            notes.forEach {
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+
+            notes?.forEachIndexed { index, note ->
                 item {
-                    NoteItem(note = it) {
-                        showDeleteNoteDialog = true
-                        selectedDeleteNoteId = it.id
+                    NoteItem(note = note, index + 1) {
+                        navHostController
+                            .navigate(MainNavigation.ReadScreen.route + "/${note.title}")
                     }
                 }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(70.dp))
             }
         }
     }
