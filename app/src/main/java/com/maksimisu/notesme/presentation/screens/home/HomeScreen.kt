@@ -23,11 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,14 +31,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.maksimisu.notesme.R
-import com.maksimisu.notesme.data.models.Note
 import com.maksimisu.notesme.presentation.navigation.MainNavigation
 import com.maksimisu.notesme.presentation.ui.components.NoteItem
-import com.maksimisu.notesme.presentation.ui.components.TwoActionsDialog
 import com.maksimisu.notesme.presentation.ui.theme.LightBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +44,7 @@ import com.maksimisu.notesme.presentation.ui.theme.LightBlue
 fun HomeScreen(navHostController: NavHostController) {
 
     val viewModel = hiltViewModel<HomeViewModel>()
-    val notes = viewModel.notes.collectAsState(initial = null).value
+    val notes = viewModel.notes.collectAsStateWithLifecycle(initialValue = emptyList()).value
 
     Scaffold(
         topBar = {
@@ -89,8 +82,13 @@ fun HomeScreen(navHostController: NavHostController) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
+                    val lastId = if (notes.maxByOrNull { it.id } != null) {
+                        notes.maxByOrNull { it.id }!!.id
+                    } else {
+                        0L
+                    }
                     navHostController
-                        .navigate(route = MainNavigation.EditScreen.route + "?name=${null}")
+                        .navigate(route = MainNavigation.EditScreen.route + "?name=${null}?lastId=${lastId}")
                 },
                 shape = RoundedCornerShape(100f),
                 containerColor = LightBlue,
@@ -118,11 +116,11 @@ fun HomeScreen(navHostController: NavHostController) {
                 Spacer(modifier = Modifier.height(10.dp))
             }
 
-            notes?.forEachIndexed { index, note ->
+            notes.forEach {
                 item {
-                    NoteItem(note = note, index + 1) {
+                    NoteItem(note = it) {
                         navHostController
-                            .navigate(MainNavigation.ReadScreen.route + "/${note.title}")
+                            .navigate(MainNavigation.ReadScreen.route + "/${it.title}")
                     }
                 }
             }

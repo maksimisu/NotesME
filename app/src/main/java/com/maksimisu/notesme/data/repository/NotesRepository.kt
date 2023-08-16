@@ -1,14 +1,11 @@
 package com.maksimisu.notesme.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.maksimisu.notesme.data.models.Note
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import java.io.File
 import java.util.Calendar
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 class NotesRepository(@ApplicationContext val context: Context) {
 
@@ -18,7 +15,14 @@ class NotesRepository(@ApplicationContext val context: Context) {
         val file = File(context.filesDir, note.title + fileType)
         if (!file.exists())
             file.createNewFile()
-        file.writeText("${note.creationDate}\n${note.body}", Charsets.UTF_8)
+        file.writeText("${note.id}\n${note.creationDate}\n${note.body}", Charsets.UTF_8)
+    }
+
+    fun loadNote(fileName: String): Note? {
+        val file = File(context.filesDir, fileName + fileType)
+        if (file.exists())
+            return file.readFile()
+        return null
     }
 
     fun loadNotes(): List<Note> {
@@ -27,66 +31,18 @@ class NotesRepository(@ApplicationContext val context: Context) {
         }
         val notes = mutableListOf<Note>()
         files.forEach { fileName ->
-            var body = ""
-            var creationDate = ""
-            val lastUpdateDate = Calendar.getInstance().timeInMillis - File(context.filesDir, fileName).lastModified()
             val file = File(context.filesDir, fileName)
-            file.useLines { lines ->
-                creationDate = lines.elementAt(0)
+            if (file.exists()) {
+                notes.add(file.readFile())
             }
-            file.useLines { lines ->
-                val linesList = lines.toList()
-                for (i in 1 until linesList.size)
-                    if (i == 1)
-                        body += linesList[i]
-                    else
-                        body += "\n${linesList[i]}"
-            }
-            notes.add(
-                Note(
-                    title = fileName.removeSuffix(fileType),
-                    body = body,
-                    creationDate = creationDate,
-                    lastUpdate = lastUpdateDate
-                )
-            )
         }
         return notes
-    }
-
-    fun loadNote(fileName: String): Note? {
-        val file = File(context.filesDir, fileName + fileType)
-        if (file.exists()) {
-            var body = ""
-            var creationDate = ""
-            val lastUpdateDate = Calendar.getInstance().timeInMillis - file.lastModified()
-            file.useLines { lines ->
-                creationDate = lines.elementAt(0)
-            }
-            file.useLines { lines ->
-                val linesList = lines.toList()
-                for (i in 1 until linesList.size) {
-                    if (i == 1)
-                        body += linesList[i]
-                    else
-                        body += "\n${linesList[i]}"
-                }
-            }
-            return Note(
-                title = fileName.removeSuffix(fileType),
-                body = body,
-                creationDate = creationDate,
-                lastUpdate = lastUpdateDate
-            )
-        } else {
-            return null
-        }
     }
 
     fun renameNote(oldFileName: String, newFileName: String) {
         val oldFile = File(context.filesDir, oldFileName + fileType)
         val newFile = File(context.filesDir, newFileName + fileType)
-        if (oldFile.exists() && !newFile.exists()) {
+        /*if (oldFile.exists() && !newFile.exists()) {
             oldFile.useLines { lines ->
                 var text = ""
                 lines.forEach {
@@ -94,7 +50,8 @@ class NotesRepository(@ApplicationContext val context: Context) {
                 }
                 newFile.writeText(text, Charsets.UTF_8)
             }
-        }
+        }*/
+        oldFile.renameTo(newFile)
     }
 
     fun deleteNote(note: Note) {
@@ -107,6 +64,34 @@ class NotesRepository(@ApplicationContext val context: Context) {
     fun checkNoteExists(title: String): Boolean {
         val file = File(context.filesDir, title + fileType)
         return file.exists()
+    }
+
+    private fun File.readFile(): Note {
+
+        val currentDate = Calendar.getInstance().timeInMillis
+        val lines = this.readLines()
+
+        var id = 0L
+        lateinit var body: String
+        val lastModified = currentDate - this.lastModified()
+        lateinit var creationDate: String
+
+        lines.forEachIndexed { index, string ->
+            when (index) {
+                0 -> id = string.toLong()
+                1 -> creationDate = string
+                2 -> body = string
+                else -> body += "\n$string"
+            }
+        }
+
+        return Note(
+            title = this.name.removeSuffix(fileType),
+            id = id,
+            body = body,
+            lastModified = lastModified,
+            creationDate = creationDate
+        )
     }
 
 }

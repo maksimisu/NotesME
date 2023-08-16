@@ -41,7 +41,6 @@ import com.maksimisu.notesme.presentation.ui.theme.LightYellow
 @Composable
 fun NoteItem(
     note: Note,
-    number: Int,
     onClick: () -> Unit
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
@@ -87,7 +86,7 @@ fun NoteItem(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = number.toString(),
+                        text = note.id.toString(),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White
                     )

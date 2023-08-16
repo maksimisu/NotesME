@@ -48,17 +48,22 @@ fun SetUpNavHost(navHostController: NavHostController) {
 
         // EDIT
         composable(
-            route = MainNavigation.EditScreen.route + "?name={name}",
+            route = MainNavigation.EditScreen.route + "?name={name}?lastId={lastId}",
             arguments = listOf(
                 navArgument(name = "name") {
                     nullable = true
                     type = NavType.StringType
+                },
+                navArgument(name = "lastId") {
+                    nullable = false
+                    type = NavType.LongType
                 }
             )
         ) {
             EditScreen(
                 navHostController = navHostController,
-                name = it.arguments?.getString("name")
+                name = it.arguments?.getString("name"),
+                lastIndex = it.arguments?.getLong("lastId")!!
             )
         }
 

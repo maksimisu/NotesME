@@ -13,4 +13,7 @@
     <string name="last_update">Last update:</string>
     <string name="done">done</string>
     <string name="note_already_exists">Note with such title already exists!</string>
+    <string name="undo">Undo</string>
+    <string name="delete">Delete</string>
+    <string name="redo">Redo</string>
 </resources>
